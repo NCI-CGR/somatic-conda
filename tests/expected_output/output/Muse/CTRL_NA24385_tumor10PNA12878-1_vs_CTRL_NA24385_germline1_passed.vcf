@@ -1,0 +1,46 @@
+##fileformat=VCFv4.1
+##FILTER=<ID=PASS,Description="Accept as a confident somatic mutation">
+##FILTER=<ID=Tier1,Description="Confident level 1">
+##FILTER=<ID=Tier2,Description="Confident level 2">
+##FILTER=<ID=Tier3,Description="Confident level 3">
+##FILTER=<ID=Tier4,Description="Confident level 4">
+##FILTER=<ID=Tier5,Description="Confident level 5">
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+##FORMAT=<ID=DP,Number=1,Type=Integer,Description="Read depth at this position in the sample">
+##FORMAT=<ID=AD,Number=.,Type=Integer,Description="Depth of reads supporting alleles 0/1/2/3...">
+##FORMAT=<ID=BQ,Number=.,Type=Integer,Description="Average base quality for reads supporting alleles">
+##FORMAT=<ID=SS,Number=1,Type=Integer,Description="Variant status relative to non-adjacent Normal,0=wildtype,1=germline,2=somatic,3=LOH,4=post-transcriptional modification,5=unknown">
+##INFO=<ID=SOMATIC,Number=0,Type=Flag,Description="Indicates if record is a somatic mutation">
+##TUMOR="Sample=CTRL_NA24385_tumor10PNA12878-1,File=../somatic-conda/tests/data/CTRL_NA24385_tumor10PNA12878-1_bqsr_test.bam"
+##NORMAL="Sample=CTRL_NA24385_germline1,File=../somatic-conda/tests/data/CTRL_NA24385_germline1_bqsr_final_test.bam"
+##MuSE_version="v1.0rc Build Date May 15 2017 Build Time 10:51:32"
+##MuSE_call_1="call -f ../somaticseq2_resource_bundle/hg19/hg19_canonical_correct_chr_order.fa -l ../somatic-conda/tests/data/test.bed -O output/Muse/CTRL_NA24385_tumor10PNA12878-1_vs_CTRL_NA24385_germline1.snp ../somatic-conda/tests/data/CTRL_NA24385_tumor10PNA12878-1_bqsr_test.bam ../somatic-conda/tests/data/CTRL_NA24385_germline1_bqsr_final_test.bam"
+##MuSE_sump="sump -I output/Muse/merged_CTRL_NA24385_tumor10PNA12878-1_vs_CTRL_NA24385_germline1_all.txt -E -O output/Muse/CTRL_NA24385_tumor10PNA12878-1_vs_CTRL_NA24385_germline1.vcf –D ../somaticseq2_resource_bundle/hg19/dbsnp_138.hg19.vcf.gz"
+##contig=<ID=chrM,length=16571,assembly=hg19_canonical+phiX_step2.nix>
+##contig=<ID=chr1,length=249250621,assembly=hg19_canonical+phiX_step2.nix>
+##contig=<ID=chr2,length=243199373,assembly=hg19_canonical+phiX_step2.nix>
+##contig=<ID=chr3,length=198022430,assembly=hg19_canonical+phiX_step2.nix>
+##contig=<ID=chr4,length=191154276,assembly=hg19_canonical+phiX_step2.nix>
+##contig=<ID=chr5,length=180915260,assembly=hg19_canonical+phiX_step2.nix>
+##contig=<ID=chr6,length=171115067,assembly=hg19_canonical+phiX_step2.nix>
+##contig=<ID=chr7,length=159138663,assembly=hg19_canonical+phiX_step2.nix>
+##contig=<ID=chr8,length=146364022,assembly=hg19_canonical+phiX_step2.nix>
+##contig=<ID=chr9,length=141213431,assembly=hg19_canonical+phiX_step2.nix>
+##contig=<ID=chr10,length=135534747,assembly=hg19_canonical+phiX_step2.nix>
+##contig=<ID=chr11,length=135006516,assembly=hg19_canonical+phiX_step2.nix>
+##contig=<ID=chr12,length=133851895,assembly=hg19_canonical+phiX_step2.nix>
+##contig=<ID=chr13,length=115169878,assembly=hg19_canonical+phiX_step2.nix>
+##contig=<ID=chr14,length=107349540,assembly=hg19_canonical+phiX_step2.nix>
+##contig=<ID=chr15,length=102531392,assembly=hg19_canonical+phiX_step2.nix>
+##contig=<ID=chr16,length=90354753,assembly=hg19_canonical+phiX_step2.nix>
+##contig=<ID=chr17,length=81195210,assembly=hg19_canonical+phiX_step2.nix>
+##contig=<ID=chr18,length=78077248,assembly=hg19_canonical+phiX_step2.nix>
+##contig=<ID=chr19,length=59128983,assembly=hg19_canonical+phiX_step2.nix>
+##contig=<ID=chr20,length=63025520,assembly=hg19_canonical+phiX_step2.nix>
+##contig=<ID=chr21,length=48129895,assembly=hg19_canonical+phiX_step2.nix>
+##contig=<ID=chr22,length=51304566,assembly=hg19_canonical+phiX_step2.nix>
+##contig=<ID=chrX,length=155270560,assembly=hg19_canonical+phiX_step2.nix>
+##contig=<ID=chrY,length=59373566,assembly=hg19_canonical+phiX_step2.nix>
+##reference=file://../somaticseq2_resource_bundle/hg19/hg19_canonical_correct_chr_order.fa
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	TUMOR	NORMAL
+chr1	1725760	.	C	T	.	PASS	SOMATIC	GT:DP:AD:BQ:SS	0/1:806:751,52:29,34:2	0/0:706:705,0:30,0:.

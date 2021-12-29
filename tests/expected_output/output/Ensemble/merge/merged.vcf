@@ -1,0 +1,195 @@
+##fileformat=VCFv4.2
+##FILTER=<ID=ADJ_LowConf,Description="Adjusted low confidence call">
+##FILTER=<ID=ADJ_PASS,Description="Adjusted high confidence call">
+##FILTER=<ID=LowConf,Description="Low confidence call">
+##FILTER=<ID=PASS,Description="high confidence call">
+##FORMAT=<ID=AD,Number=R,Type=Integer,Description="Allelic depths for the ref and alt alleles in the order listed">
+##FORMAT=<ID=DP,Number=1,Type=Integer,Description="Total Depth">
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+##FORMAT=<ID=Muse_BQ,Number=.,Type=Integer,Description="Average base quality for reads supporting alleles">
+##FORMAT=<ID=Muse_DP,Number=1,Type=Integer,Description="Read depth at this position in the sample">
+##FORMAT=<ID=Muse_GT,Number=1,Type=String,Description="Genotype">
+##FORMAT=<ID=Muse_SS,Number=1,Type=Integer,Description="Variant status relative to non-adjacent Normal,0=wildtype,1=germline,2=somatic,3=LOH,4=post-transcriptional modification,5=unknown">
+##FORMAT=<ID=Mutect2_AD,Number=R,Type=Integer,Description="Allelic depths for the ref and alt alleles in the order listed">
+##FORMAT=<ID=Mutect2_AF,Number=A,Type=Float,Description="Allele fractions of alternate alleles in the tumor">
+##FORMAT=<ID=Mutect2_DP,Number=1,Type=Integer,Description="Approximate read depth (reads with MQ=255 or with bad mates are filtered)">
+##FORMAT=<ID=Mutect2_F1R2,Number=R,Type=Integer,Description="Count of reads in F1R2 pair orientation supporting each allele">
+##FORMAT=<ID=Mutect2_F2R1,Number=R,Type=Integer,Description="Count of reads in F2R1 pair orientation supporting each allele">
+##FORMAT=<ID=Mutect2_GQ,Number=1,Type=Integer,Description="Genotype Quality">
+##FORMAT=<ID=Mutect2_GT,Number=1,Type=String,Description="Genotype">
+##FORMAT=<ID=Mutect2_PGT,Number=1,Type=String,Description="Physical phasing haplotype information, describing how the alternate alleles are phased in relation to one another">
+##FORMAT=<ID=Mutect2_PID,Number=1,Type=String,Description="Physical phasing ID information, where each unique ID within a given sample (but not across samples) connects records within a phasing group">
+##FORMAT=<ID=Mutect2_PL,Number=G,Type=Integer,Description="Normalized, Phred-scaled likelihoods for genotypes as defined in the VCF specification">
+##FORMAT=<ID=Mutect2_PS,Number=1,Type=Integer,Description="Phasing set (typically the position of the first variant in the set)">
+##FORMAT=<ID=Mutect2_SB,Number=4,Type=Integer,Description="Per-sample component statistics which comprise the Fisher's Exact Test to detect strand bias.">
+##FORMAT=<ID=Strelka_AU,Number=2,Type=Integer,Description="Number of 'A' alleles used in tiers 1,2">
+##FORMAT=<ID=Strelka_BCN50,Number=1,Type=Float,Description="Fraction of filtered reads within 50 bases of the indel.">
+##FORMAT=<ID=Strelka_CU,Number=2,Type=Integer,Description="Number of 'C' alleles used in tiers 1,2">
+##FORMAT=<ID=Strelka_DP,Number=1,Type=Integer,Description="Read depth for tier1 (used+filtered)">
+##FORMAT=<ID=Strelka_DP2,Number=1,Type=Integer,Description="Read depth for tier2">
+##FORMAT=<ID=Strelka_DP50,Number=1,Type=Float,Description="Average tier1 read depth within 50 bases">
+##FORMAT=<ID=Strelka_FDP,Number=1,Type=Integer,Description="Number of basecalls filtered from original read depth for tier1">
+##FORMAT=<ID=Strelka_FDP50,Number=1,Type=Float,Description="Average tier1 number of basecalls filtered from original read depth within 50 bases">
+##FORMAT=<ID=Strelka_GU,Number=2,Type=Integer,Description="Number of 'G' alleles used in tiers 1,2">
+##FORMAT=<ID=Strelka_SDP,Number=1,Type=Integer,Description="Number of reads with deletions spanning this site at tier1">
+##FORMAT=<ID=Strelka_SUBDP,Number=1,Type=Integer,Description="Number of reads below tier1 mapping quality threshold aligned across this site">
+##FORMAT=<ID=Strelka_SUBDP50,Number=1,Type=Float,Description="Average number of reads below tier1 mapping quality threshold aligned across sites within 50 bases">
+##FORMAT=<ID=Strelka_TAR,Number=2,Type=Integer,Description="Reads strongly supporting alternate allele for tiers 1,2">
+##FORMAT=<ID=Strelka_TIR,Number=2,Type=Integer,Description="Reads strongly supporting indel allele for tiers 1,2">
+##FORMAT=<ID=Strelka_TOR,Number=2,Type=Integer,Description="Other reads (weak support or insufficient indel breakpoint overlap) for tiers 1,2">
+##FORMAT=<ID=Strelka_TU,Number=2,Type=Integer,Description="Number of 'T' alleles used in tiers 1,2">
+##FORMAT=<ID=Vardict_AD,Number=R,Type=Integer,Description="Allelic depths for the ref and alt alleles in the order listed">
+##FORMAT=<ID=Vardict_ADJAF,Number=1,Type=Float,Description="Adjusted AF for indels due to local realignment">
+##FORMAT=<ID=Vardict_AF,Number=A,Type=Float,Description="Allele Frequency">
+##FORMAT=<ID=Vardict_ALD,Number=2,Type=Integer,Description="Variant forward, reverse reads">
+##FORMAT=<ID=Vardict_BIAS,Number=2,Type=String,Description="Strand Bias Info">
+##FORMAT=<ID=Vardict_DP,Number=1,Type=Integer,Description="Total Depth">
+##FORMAT=<ID=Vardict_GT,Number=1,Type=String,Description="Genotype">
+##FORMAT=<ID=Vardict_HIAF,Number=1,Type=Float,Description="Allele frequency using only high quality bases">
+##FORMAT=<ID=Vardict_MQ,Number=1,Type=Integer,Description="Mean Mapping Quality">
+##FORMAT=<ID=Vardict_NM,Number=1,Type=Float,Description="Mean mismatches in reads">
+##FORMAT=<ID=Vardict_ODDRATIO,Number=1,Type=Float,Description="Strand Bias Odds ratio">
+##FORMAT=<ID=Vardict_PMEAN,Number=1,Type=Float,Description="Mean position in reads">
+##FORMAT=<ID=Vardict_PSTD,Number=1,Type=Float,Description="Position STD in reads">
+##FORMAT=<ID=Vardict_QSTD,Number=1,Type=Float,Description="Quality score STD in reads">
+##FORMAT=<ID=Vardict_QUAL,Number=1,Type=Float,Description="Mean quality score in reads">
+##FORMAT=<ID=Vardict_RD,Number=2,Type=Integer,Description="Reference forward, reverse reads">
+##FORMAT=<ID=Vardict_SBF,Number=1,Type=Float,Description="Strand Bias Fisher p-value">
+##FORMAT=<ID=Vardict_SN,Number=1,Type=Float,Description="Signal to noise">
+##FORMAT=<ID=Vardict_VD,Number=1,Type=Integer,Description="Variant Depth">
+##GATKCommandLine.CombineVariants=<ID=CombineVariants,Version=3.8-1-0-gf15c1c3ef,Date="Thu Dec 23 12:48:44 EST 2021",Epoch=1640281724314,CommandLineOptions="analysis_type=CombineVariants input_file=[] showFullBamList=false read_buffer_size=null read_filter=[] disable_read_filter=[] intervals=null excludeIntervals=null interval_set_rule=UNION interval_merging=ALL interval_padding=0 reference_sequence=../somaticseq2_resource_bundle/hg19/hg19_canonical_correct_chr_order.fa nonDeterministicRandomSeed=false disableDithering=false maxRuntime=-1 maxRuntimeUnits=MINUTES downsampling_type=BY_SAMPLE downsample_to_fraction=null downsample_to_coverage=1000 baq=OFF baqGapOpenPenalty=40.0 refactor_NDN_cigar_string=false fix_misencoded_quality_scores=false allow_potentially_misencoded_quality_scores=false useOriginalQualities=false defaultBaseQualities=-1 performanceLog=null BQSR=null quantize_quals=0 static_quantized_quals=null round_down_quantized=false disable_indel_quals=false emit_original_quals=false preserve_qscores_less_than=6 globalQScorePrior=-1.0 secondsBetweenProgressUpdates=10 validation_strictness=SILENT remove_program_records=false keep_program_records=false sample_rename_mapping_file=null unsafe=null use_jdk_deflater=false use_jdk_inflater=false disable_auto_index_creation_and_locking_when_reading_rods=false no_cmdline_in_header=false sites_only=false never_trim_vcf_format_field=false bcf=false bam_compression=null simplifyBAM=false disable_bam_indexing=false generate_md5=false num_threads=1 num_cpu_threads_per_data_thread=1 num_io_threads=0 monitorThreadEfficiency=false num_bam_file_handles=null read_group_black_list=null pedigree=[] pedigreeString=[] pedigreeValidationType=STRICT allow_intervals_with_unindexed_bam=false generateShadowBCF=false variant_index_type=DYNAMIC_SEEK variant_index_parameter=-1 reference_window_stop=0 phone_home= gatk_key=null tag=NA logging_level=INFO log_to_file=null help=false version=false variant=[(RodBindingCollection [(RodBinding name=variant source=output/Ensemble/CTRL_NA24385_tumor10PNA12878-1_vs_CTRL_NA24385_germline1_5callers_voting_PASS.vcf)]), (RodBindingCollection [(RodBinding name=variant2 source=output/Ensemble/CTRL_NA24385_tumor20PNA12878-2_vs_CTRL_NA24385_germline1_5callers_voting_PASS.vcf)])] out=/mnt/nfs/gigantor/ifs/DCEG/Projects/CoherentLogic/somatic/workspace2/output/Ensemble/merge/merged.vcf genotypemergeoption=UNIQUIFY filteredrecordsmergetype=KEEP_IF_ANY_UNFILTERED multipleallelesmergetype=BY_TYPE rod_priority_list=null printComplexMerges=false filteredAreUncalled=false minimalVCF=false excludeNonVariants=false setKey=set assumeIdenticalSamples=false minimumN=1 suppressCommandLineHeader=false mergeInfoWithMaxAC=false filter_reads_with_N_cigar=false filter_mismatching_base_and_quals=false filter_bases_not_stored=false">
+##GATKCommandLine.SelectVariants=<ID=SelectVariants,Version=3.8-1-0-gf15c1c3ef,Date="Thu Dec 23 12:42:14 EST 2021",Epoch=1640281334285,CommandLineOptions="analysis_type=SelectVariants input_file=[] showFullBamList=false read_buffer_size=null read_filter=[] disable_read_filter=[] intervals=[../somatic-conda/tests/data/test.bed] excludeIntervals=null interval_set_rule=UNION interval_merging=ALL interval_padding=0 reference_sequence=../somaticseq2_resource_bundle/hg19/hg19_canonical_correct_chr_order.fa nonDeterministicRandomSeed=false disableDithering=false maxRuntime=-1 maxRuntimeUnits=MINUTES downsampling_type=BY_SAMPLE downsample_to_fraction=null downsample_to_coverage=1000 baq=OFF baqGapOpenPenalty=40.0 refactor_NDN_cigar_string=false fix_misencoded_quality_scores=false allow_potentially_misencoded_quality_scores=false useOriginalQualities=false defaultBaseQualities=-1 performanceLog=null BQSR=null quantize_quals=0 static_quantized_quals=null round_down_quantized=false disable_indel_quals=false emit_original_quals=false preserve_qscores_less_than=6 globalQScorePrior=-1.0 secondsBetweenProgressUpdates=10 validation_strictness=SILENT remove_program_records=false keep_program_records=false sample_rename_mapping_file=null unsafe=null use_jdk_deflater=false use_jdk_inflater=false disable_auto_index_creation_and_locking_when_reading_rods=true no_cmdline_in_header=false sites_only=false never_trim_vcf_format_field=false bcf=false bam_compression=null simplifyBAM=false disable_bam_indexing=false generate_md5=false num_threads=1 num_cpu_threads_per_data_thread=1 num_io_threads=0 monitorThreadEfficiency=false num_bam_file_handles=null read_group_black_list=null pedigree=[] pedigreeString=[] pedigreeValidationType=STRICT allow_intervals_with_unindexed_bam=false generateShadowBCF=false variant_index_type=DYNAMIC_SEEK variant_index_parameter=-1 reference_window_stop=0 phone_home= gatk_key=null tag=NA logging_level=INFO log_to_file=null help=false version=false variant=(RodBinding name=variant source=output/Vardict/CTRL_NA24385_tumor10PNA12878-1_vs_CTRL_NA24385_germline1_all_fil.vcf) discordance=(RodBinding name= source=UNBOUND) concordance=(RodBinding name= source=UNBOUND) out=/mnt/nfs/gigantor/ifs/DCEG/Projects/CoherentLogic/somatic/workspace2/output/Vardict/CTRL_NA24385_tumor10PNA12878-1_vs_CTRL_NA24385_germline1_final.vcf sample_name=[] sample_expressions=null sample_file=null exclude_sample_name=[] exclude_sample_file=[] exclude_sample_expressions=[] selectexpressions=[] invertselect=false excludeNonVariants=false excludeFiltered=false preserveAlleles=false removeUnusedAlternates=false restrictAllelesTo=ALL keepOriginalAC=false keepOriginalDP=false mendelianViolation=false invertMendelianViolation=false mendelianViolationQualThreshold=0.0 select_random_fraction=0.0 remove_fraction_genotypes=0.0 selectTypeToInclude=[] selectTypeToExclude=[] keepIDs=null excludeIDs=null fullyDecode=false justRead=false maxIndelSize=2147483647 minIndelSize=0 maxFilteredGenotypes=2147483647 minFilteredGenotypes=0 maxFractionFilteredGenotypes=1.0 minFractionFilteredGenotypes=0.0 maxNOCALLnumber=2147483647 maxNOCALLfraction=1.0 setFilteredGtToNocall=false ALLOW_NONOVERLAPPING_COMMAND_LINE_SAMPLES=false forceValidOutput=false filter_reads_with_N_cigar=false filter_mismatching_base_and_quals=false filter_bases_not_stored=false">
+##GATKCommandLine.VariantFiltration=<ID=VariantFiltration,Version=3.8-1-0-gf15c1c3ef,Date="Thu Dec 23 12:42:12 EST 2021",Epoch=1640281332241,CommandLineOptions="analysis_type=VariantFiltration input_file=[] showFullBamList=false read_buffer_size=null read_filter=[] disable_read_filter=[] intervals=null excludeIntervals=null interval_set_rule=UNION interval_merging=ALL interval_padding=0 reference_sequence=../somaticseq2_resource_bundle/hg19/hg19_canonical_correct_chr_order.fa nonDeterministicRandomSeed=false disableDithering=false maxRuntime=-1 maxRuntimeUnits=MINUTES downsampling_type=BY_SAMPLE downsample_to_fraction=null downsample_to_coverage=1000 baq=OFF baqGapOpenPenalty=40.0 refactor_NDN_cigar_string=false fix_misencoded_quality_scores=false allow_potentially_misencoded_quality_scores=false useOriginalQualities=false defaultBaseQualities=-1 performanceLog=null BQSR=null quantize_quals=0 static_quantized_quals=null round_down_quantized=false disable_indel_quals=false emit_original_quals=false preserve_qscores_less_than=6 globalQScorePrior=-1.0 secondsBetweenProgressUpdates=10 validation_strictness=SILENT remove_program_records=false keep_program_records=false sample_rename_mapping_file=null unsafe=null use_jdk_deflater=false use_jdk_inflater=false disable_auto_index_creation_and_locking_when_reading_rods=false no_cmdline_in_header=false sites_only=false never_trim_vcf_format_field=false bcf=false bam_compression=null simplifyBAM=false disable_bam_indexing=false generate_md5=false num_threads=1 num_cpu_threads_per_data_thread=1 num_io_threads=0 monitorThreadEfficiency=false num_bam_file_handles=null read_group_black_list=null pedigree=[] pedigreeString=[] pedigreeValidationType=STRICT allow_intervals_with_unindexed_bam=false generateShadowBCF=false variant_index_type=DYNAMIC_SEEK variant_index_parameter=-1 reference_window_stop=0 phone_home= gatk_key=null tag=NA logging_level=INFO log_to_file=null help=false version=false variant=(RodBinding name=variant source=output/Vardict/CTRL_NA24385_tumor10PNA12878-1_vs_CTRL_NA24385_germline1_all_sorted.vcf) mask=(RodBinding name= source=UNBOUND) out=/mnt/nfs/gigantor/ifs/DCEG/Projects/CoherentLogic/somatic/workspace2/output/Vardict/CTRL_NA24385_tumor10PNA12878-1_vs_CTRL_NA24385_germline1_all_fil.vcf filterExpression=[((AF*DP < 6) && ((MQ < 55.0 && NM > 1.0) || (MQ < 60.0 && NM > 2.0) || (DP < 10) || (QUAL < 45)))] filterName=[VardictFilter] genotypeFilterExpression=[] genotypeFilterName=[] clusterSize=3 clusterWindowSize=0 maskExtension=0 maskName=Mask filterNotInMask=false missingValuesInExpressionsShouldEvaluateAsFailing=false invalidatePreviousFilters=false invertFilterExpression=false invertGenotypeFilterExpression=false setFilteredGtToNocall=false filter_reads_with_N_cigar=false filter_mismatching_base_and_quals=false filter_bases_not_stored=false">
+##GATKCommandLine=<ID=FilterMutectCalls,CommandLine="FilterMutectCalls  --output output/Mutect2/CTRL_NA24385_tumor10PNA12878-1_vs_CTRL_NA24385_germline1_WES_passed.vcf --variant output/Mutect2/CTRL_NA24385_tumor10PNA12878-1_vs_CTRL_NA24385_germline1_WES.vcf --reference ../somaticseq2_resource_bundle/hg19/hg19_canonical_correct_chr_order.fa  --threshold-strategy OPTIMAL_F_SCORE --f-score-beta 1.0 --false-discovery-rate 0.05 --initial-threshold 0.1 --mitochondria-mode false --max-events-in-region 2 --max-alt-allele-count 1 --unique-alt-read-count 0 --min-median-mapping-quality 30 --min-median-base-quality 20 --max-median-fragment-length-difference 10000 --min-median-read-position 1 --max-n-ratio Infinity --min-reads-per-strand 0 --autosomal-coverage 0.0 --max-numt-fraction 0.85 --min-allele-fraction 0.0 --contamination-estimate 0.0 --log-snv-prior -13.815510557964275 --log-indel-prior -16.11809565095832 --log-artifact-prior -2.302585092994046 --normal-p-value-threshold 0.001 --min-slippage-length 8 --pcr-slippage-rate 0.1 --distance-on-haplotype 100 --long-indel-length 5 --interval-set-rule UNION --interval-padding 0 --interval-exclusion-padding 0 --interval-merging-rule ALL --read-validation-stringency SILENT --seconds-between-progress-updates 10.0 --disable-sequence-dictionary-validation false --create-output-bam-index true --create-output-bam-md5 false --create-output-variant-index true --create-output-variant-md5 false --lenient false --add-output-sam-program-record true --add-output-vcf-command-line true --cloud-prefetch-buffer 40 --cloud-index-prefetch-buffer -1 --disable-bam-index-caching false --sites-only-vcf-output false --help false --version false --showHidden false --verbosity INFO --QUIET false --use-jdk-deflater false --use-jdk-inflater false --gcs-max-retries 20 --gcs-project-for-requester-pays  --disable-tool-default-read-filters false",Version="4.1.3.0",Date="December 23, 2021 12:42:39 PM EST">
+##INFO=<ID=AC,Number=A,Type=Integer,Description="Allele count in genotypes, for each ALT allele, in the same order as listed">
+##INFO=<ID=AF,Number=A,Type=Float,Description="Allele Frequency, for each ALT allele, in the same order as listed">
+##INFO=<ID=AN,Number=1,Type=Integer,Description="Total number of alleles in called genotypes">
+##INFO=<ID=Lofreq_AF,Number=A,Type=Float,Description="Allele Frequency, for each ALT allele, in the same order as listed">
+##INFO=<ID=Lofreq_CONSVAR,Number=0,Type=Flag,Description="Indicates that the variant is a consensus variant (as opposed to a low frequency variant).">
+##INFO=<ID=Lofreq_DP,Number=1,Type=Integer,Description="Raw Depth">
+##INFO=<ID=Lofreq_DP4,Number=4,Type=Integer,Description="Counts for ref-forward bases, ref-reverse, alt-forward and alt-reverse bases">
+##INFO=<ID=Lofreq_HRUN,Number=1,Type=Integer,Description="Homopolymer length to the right of report indel position">
+##INFO=<ID=Lofreq_INDEL,Number=0,Type=Flag,Description="Indicates that the variant is an INDEL.">
+##INFO=<ID=Lofreq_QUAL,Number=1,Type=Float,Description="Lofreq QUAL">
+##INFO=<ID=Lofreq_SB,Number=1,Type=Float,Description="Strand Bias">
+##INFO=<ID=Lofreq_SOMATIC,Number=0,Type=Flag,Description="Somatic event">
+##INFO=<ID=Lofreq_UNIQ,Number=0,Type=Flag,Description="Unique, i.e. not detectable in paired sample">
+##INFO=<ID=Lofreq_UQ,Number=1,Type=Integer,Description="Phred-scaled uniq score at this position">
+##INFO=<ID=Muse_SOMATIC,Number=0,Type=Flag,Description="Indicates if record is a somatic mutation">
+##INFO=<ID=Mutect2_CONTQ,Number=1,Type=Float,Description="Phred-scaled qualities that alt allele are not due to contamination">
+##INFO=<ID=Mutect2_DP,Number=1,Type=Integer,Description="Approximate read depth; some reads may have been filtered">
+##INFO=<ID=Mutect2_ECNT,Number=1,Type=Integer,Description="Number of events in this haplotype">
+##INFO=<ID=Mutect2_GERMQ,Number=1,Type=Integer,Description="Phred-scaled quality that alt alleles are not germline variants">
+##INFO=<ID=Mutect2_MBQ,Number=R,Type=Integer,Description="median base quality">
+##INFO=<ID=Mutect2_MFRL,Number=R,Type=Integer,Description="median fragment length">
+##INFO=<ID=Mutect2_MMQ,Number=R,Type=Integer,Description="median mapping quality">
+##INFO=<ID=Mutect2_MPOS,Number=A,Type=Integer,Description="median distance from end of read">
+##INFO=<ID=Mutect2_NALOD,Number=A,Type=Float,Description="Negative log 10 odds of artifact in normal with same allele fraction as tumor">
+##INFO=<ID=Mutect2_NCount,Number=1,Type=Integer,Description="Count of N bases in the pileup">
+##INFO=<ID=Mutect2_NLOD,Number=A,Type=Float,Description="Normal log 10 likelihood ratio of diploid het or hom alt genotypes">
+##INFO=<ID=Mutect2_OCM,Number=1,Type=Integer,Description="Number of alt reads whose original alignment doesn't match the current contig.">
+##INFO=<ID=Mutect2_OLD_VARIANT,Number=.,Type=String,Description="Original chr:pos:ref:alt encoding">
+##INFO=<ID=Mutect2_PON,Number=0,Type=Flag,Description="site found in panel of normals">
+##INFO=<ID=Mutect2_POPAF,Number=A,Type=Float,Description="negative log 10 population allele frequencies of alt alleles">
+##INFO=<ID=Mutect2_ROQ,Number=1,Type=Float,Description="Phred-scaled qualities that alt allele are not due to read orientation artifact">
+##INFO=<ID=Mutect2_RPA,Number=.,Type=Integer,Description="Number of times tandem repeat unit is repeated, for each allele (including reference)">
+##INFO=<ID=Mutect2_RU,Number=1,Type=String,Description="Tandem repeat unit (bases)">
+##INFO=<ID=Mutect2_SEQQ,Number=1,Type=Integer,Description="Phred-scaled quality that alt alleles are not sequencing errors">
+##INFO=<ID=Mutect2_STR,Number=0,Type=Flag,Description="Variant is a short tandem repeat">
+##INFO=<ID=Mutect2_STRANDQ,Number=1,Type=Integer,Description="Phred-scaled quality of strand bias artifact">
+##INFO=<ID=Mutect2_STRQ,Number=1,Type=Integer,Description="Phred-scaled quality that alt alleles in STRs are not polymerase slippage errors">
+##INFO=<ID=Mutect2_TLOD,Number=A,Type=Float,Description="Log 10 likelihood ratio score of variant existing versus not existing">
+##INFO=<ID=Mutect2_UNIQ_ALT_READ_COUNT,Number=1,Type=Integer,Description="Number of ALT reads with unique start and mate end positions at a variant site">
+##INFO=<ID=NumCallers,Number=1,Type=Integer,Description="The number of callers">
+##INFO=<ID=Strelka_DP,Number=1,Type=Integer,Description="Combined depth across samples">
+##INFO=<ID=Strelka_IC,Number=1,Type=Integer,Description="Number of times RU repeats in the indel allele">
+##INFO=<ID=Strelka_IHP,Number=1,Type=Integer,Description="Largest reference interrupted homopolymer length intersecting with the indel">
+##INFO=<ID=Strelka_MQ,Number=1,Type=Float,Description="RMS Mapping Quality">
+##INFO=<ID=Strelka_MQ0,Number=1,Type=Integer,Description="Total Mapping Quality Zero Reads">
+##INFO=<ID=Strelka_NT,Number=1,Type=String,Description="Genotype of the normal in all data tiers, as used to classify somatic variants. One of {ref,het,hom,conflict}.">
+##INFO=<ID=Strelka_OLD_VARIANT,Number=.,Type=String,Description="Original chr:pos:ref:alt encoding">
+##INFO=<ID=Strelka_OVERLAP,Number=0,Type=Flag,Description="Somatic indel possibly overlaps a second indel.">
+##INFO=<ID=Strelka_PNOISE,Number=1,Type=Float,Description="Fraction of panel containing non-reference noise at this site">
+##INFO=<ID=Strelka_PNOISE2,Number=1,Type=Float,Description="Fraction of panel containing more than one non-reference noise obs at this site">
+##INFO=<ID=Strelka_QSI,Number=1,Type=Integer,Description="Quality score for any somatic variant, ie. for the ALT haplotype to be present at a significantly different frequency in the tumor and normal">
+##INFO=<ID=Strelka_QSI_NT,Number=1,Type=Integer,Description="Quality score reflecting the joint probability of a somatic variant and NT">
+##INFO=<ID=Strelka_QSS,Number=1,Type=Integer,Description="Quality score for any somatic snv, ie. for the ALT allele to be present at a significantly different frequency in the tumor and normal">
+##INFO=<ID=Strelka_QSS_NT,Number=1,Type=Integer,Description="Quality score reflecting the joint probability of a somatic variant and NT">
+##INFO=<ID=Strelka_RC,Number=1,Type=Integer,Description="Number of times RU repeats in the reference allele">
+##INFO=<ID=Strelka_RU,Number=1,Type=String,Description="Smallest repeating sequence unit in inserted or deleted sequence">
+##INFO=<ID=Strelka_ReadPosRankSum,Number=1,Type=Float,Description="Z-score from Wilcoxon rank sum test of Alt Vs. Ref read-position in the tumor">
+##INFO=<ID=Strelka_SGT,Number=1,Type=String,Description="Most likely somatic genotype excluding normal noise states">
+##INFO=<ID=Strelka_SNVSB,Number=1,Type=Float,Description="Somatic SNV site strand bias">
+##INFO=<ID=Strelka_SOMATIC,Number=0,Type=Flag,Description="Somatic mutation">
+##INFO=<ID=Strelka_SomaticEVS,Number=1,Type=Float,Description="Somatic Empirical Variant Score (EVS) expressing the phred-scaled probability of the call being a false positive observation.">
+##INFO=<ID=Strelka_TQSI,Number=1,Type=Integer,Description="Data tier used to compute QSI">
+##INFO=<ID=Strelka_TQSI_NT,Number=1,Type=Integer,Description="Data tier used to compute QSI_NT">
+##INFO=<ID=Strelka_TQSS,Number=1,Type=Integer,Description="Data tier used to compute QSS">
+##INFO=<ID=Strelka_TQSS_NT,Number=1,Type=Integer,Description="Data tier used to compute QSS_NT">
+##INFO=<ID=Tumor_AF,Number=1,Type=Float,Description="Tumor Allelic Fraction from individual VCFs based on callers priority">
+##INFO=<ID=Tumor_DP,Number=1,Type=Integer,Description="Tumor Depth retrieved from individual VCFs based on callers priority">
+##INFO=<ID=Vardict_AC,Number=A,Type=Integer,Description="Allele count in genotypes, for each ALT allele, in the same order as listed">
+##INFO=<ID=Vardict_AF,Number=A,Type=Float,Description="Allele Frequency">
+##INFO=<ID=Vardict_AN,Number=1,Type=Integer,Description="Total number of alleles in called genotypes">
+##INFO=<ID=Vardict_DP,Number=1,Type=Integer,Description="Approximate read depth; some reads may have been filtered">
+##INFO=<ID=Vardict_END,Number=1,Type=Integer,Description="Chr End Position">
+##INFO=<ID=Vardict_LSEQ,Number=1,Type=String,Description="5' flanking seq">
+##INFO=<ID=Vardict_MSI,Number=1,Type=Float,Description="MicroSatellite. > 1 indicates MSI">
+##INFO=<ID=Vardict_MSILEN,Number=1,Type=Float,Description="MSI unit repeat length in bp">
+##INFO=<ID=Vardict_OLD_VARIANT,Number=.,Type=String,Description="Original chr:pos:ref:alt encoding">
+##INFO=<ID=Vardict_QUAL,Number=1,Type=Float,Description="Vardict QUAL">
+##INFO=<ID=Vardict_RSEQ,Number=1,Type=String,Description="3' flanking seq">
+##INFO=<ID=Vardict_SAMPLE,Number=1,Type=String,Description="Sample name (with whitespace translated to underscores)">
+##INFO=<ID=Vardict_SHIFT3,Number=1,Type=Integer,Description="No. of bases to be shifted to 3 prime for deletions due to alternative alignment">
+##INFO=<ID=Vardict_SOR,Number=1,Type=Float,Description="Odds ratio">
+##INFO=<ID=Vardict_SSF,Number=1,Type=Float,Description="P-value">
+##INFO=<ID=Vardict_STATUS,Number=1,Type=String,Description="Somatic or germline status">
+##INFO=<ID=Vardict_TYPE,Number=1,Type=String,Description="Variant Type: SNV Insertion Deletion Complex">
+##INFO=<ID=Vardict_VD,Number=1,Type=Integer,Description="Variant Depth">
+##INFO=<ID=lLsSuMD,Number=1,Type=String,Description="Calling descision of the callers in a binary string: lofreq-snv,lofreq-indel,strelka-snv,strelka-indel,muse,mutect2,vardict">
+##INFO=<ID=set,Number=1,Type=String,Description="Source VCF for the merged record in CombineVariants">
+##MuSE_call_1="call -f ../somaticseq2_resource_bundle/hg19/hg19_canonical_correct_chr_order.fa -l ../somatic-conda/tests/data/test.bed -O output/Muse/CTRL_NA24385_tumor10PNA12878-1_vs_CTRL_NA24385_germline1.snp ../somatic-conda/tests/data/CTRL_NA24385_tumor10PNA12878-1_bqsr_test.bam ../somatic-conda/tests/data/CTRL_NA24385_germline1_bqsr_final_test.bam"
+##MuSE_sump="sump -I output/Muse/merged_CTRL_NA24385_tumor10PNA12878-1_vs_CTRL_NA24385_germline1_all.txt -E -O output/Muse/CTRL_NA24385_tumor10PNA12878-1_vs_CTRL_NA24385_germline1.vcf ?D ../somaticseq2_resource_bundle/hg19/dbsnp_138.hg19.vcf.gz"
+##MuSE_version="v1.0rc Build Date May 15 2017 Build Time 10:51:32"
+##MutectVersion=2.2
+##NORMAL="Sample=CTRL_NA24385_germline1,File=../somatic-conda/tests/data/CTRL_NA24385_germline1_bqsr_final_test.bam"
+##TUMOR="Sample=CTRL_NA24385_tumor10PNA12878-1,File=../somatic-conda/tests/data/CTRL_NA24385_tumor10PNA12878-1_bqsr_test.bam"
+##cmdline=/DCEG/CGF/Bioinformatics/software/strelka-2.9.2.centos6_x86_64/bin/configureStrelkaSomaticWorkflow.py --normalBam ../somatic-conda/tests/data/CTRL_NA24385_germline1_bqsr_final_test.bam --tumorBam ../somatic-conda/tests/data/CTRL_NA24385_tumor10PNA12878-1_bqsr_test.bam --referenceFasta ../somaticseq2_resource_bundle/hg19/hg19_canonical_correct_chr_order.fa --indelCandidates output/Manta/CTRL_NA24385_tumor10PNA12878-1_vs_CTRL_NA24385_germline1/results/variants/candidateSmallIndels.vcf.gz --runDir output/Strelka/CTRL_NA24385_tumor10PNA12878-1_vs_CTRL_NA24385_germline1 --exome
+##content=strelka somatic snv calls
+##contig=<ID=chrM,length=16571,assembly=hg19>
+##contig=<ID=chr1,length=249250621,assembly=hg19>
+##contig=<ID=chr2,length=243199373,assembly=hg19>
+##contig=<ID=chr3,length=198022430,assembly=hg19>
+##contig=<ID=chr4,length=191154276,assembly=hg19>
+##contig=<ID=chr5,length=180915260,assembly=hg19>
+##contig=<ID=chr6,length=171115067,assembly=hg19>
+##contig=<ID=chr7,length=159138663,assembly=hg19>
+##contig=<ID=chr8,length=146364022,assembly=hg19>
+##contig=<ID=chr9,length=141213431,assembly=hg19>
+##contig=<ID=chr10,length=135534747,assembly=hg19>
+##contig=<ID=chr11,length=135006516,assembly=hg19>
+##contig=<ID=chr12,length=133851895,assembly=hg19>
+##contig=<ID=chr13,length=115169878,assembly=hg19>
+##contig=<ID=chr14,length=107349540,assembly=hg19>
+##contig=<ID=chr15,length=102531392,assembly=hg19>
+##contig=<ID=chr16,length=90354753,assembly=hg19>
+##contig=<ID=chr17,length=81195210,assembly=hg19>
+##contig=<ID=chr18,length=78077248,assembly=hg19>
+##contig=<ID=chr19,length=59128983,assembly=hg19>
+##contig=<ID=chr20,length=63025520,assembly=hg19>
+##contig=<ID=chr21,length=48129895,assembly=hg19>
+##contig=<ID=chr22,length=51304566,assembly=hg19>
+##contig=<ID=chrX,length=155270560,assembly=hg19>
+##contig=<ID=chrY,length=59373566,assembly=hg19>
+##fileDate=20211223
+##filtering_status=These calls have been filtered by FilterMutectCalls to label false positives with a list of failed filters and true positives with PASS.
+##normal_sample=CTRL_NA24385_germline1
+##priorSomaticIndelRate=1e-06
+##priorSomaticSnvRate=0.0001
+##reference=file:///mnt/nfs/gigantor/ifs/DCEG/Projects/CoherentLogic/somatic/workspace2/../somaticseq2_resource_bundle/hg19/hg19_canonical_correct_chr_order.fa
+##source=lofreq call -d 101000 -f ../somaticseq2_resource_bundle/hg19/hg19_canonical_correct_chr_order.fa --verbose --no-default-filter -b 1 --call-indels -a 0.010000 -C 7 -s -S output/Lofreq/CTRL_NA24385_tumor10PNA12878-1_vs_CTRL_NA24385_germline1_normal_stringent.snvs.vcf.gz,output/Lofreq/CTRL_NA24385_tumor10PNA12878-1_vs_CTRL_NA24385_germline1_normal_stringent.indels.vcf.gz --no-default-filter -r chr1:1716479-1716809 -o /tmp/2944944.1.all.q/lofreq2_call_paralleluwar4k02/0.vcf.gz output/Lofreq/tumorBAM/CTRL_NA24385_tumor10PNA12878-1_bqsr_test_sorted.bam
+##source_version=2.9.2
+##startTime=Thu Dec 23 12:43:58 2021
+##tumor_sample=CTRL_NA24385_tumor10PNA12878-1
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	CTRL_NA24385_germline1_bqsr_final_test.variant	CTRL_NA24385_germline1_bqsr_final_test.variant2	CTRL_NA24385_tumor10PNA12878-1_bqsr_test.variant	CTRL_NA24385_tumor20PNA12878-1_bqsr_test.variant2
+chr1	1725760	.	C	T	.	ADJ_PASS;PASS	AC=2;AF=0.250;AN=8;Lofreq_SOMATIC;Lofreq_UQ=2125;Muse_SOMATIC;Mutect2_CONTQ=93;Mutect2_ECNT=1;Mutect2_GERMQ=93;Mutect2_MBQ=30,35;Mutect2_MMQ=70,70;Mutect2_POPAF=6;Mutect2_SEQQ=93;NumCallers=5;Strelka_MQ=70.00;Strelka_MQ0=0;Strelka_NT=ref;Strelka_QSS_NT=3070;Strelka_SGT=CC->CT;Strelka_SNVSB=0.00;Strelka_SOMATIC;Strelka_TQSS=1;Strelka_TQSS_NT=1;Vardict_LSEQ=GCAGGAGAATCATTTGAACC;Vardict_MSI=2;Vardict_MSILEN=1;Vardict_RSEQ=GGCAGTTCAAGTTGTTAATG;Vardict_SAMPLE=Tumor;Vardict_SHIFT3=1;Vardict_SOR=0;Vardict_SSF=0;Vardict_STATUS=StrongSomatic;Vardict_TYPE=SNV;lLsSuMD=1010111;set=FilteredInAll	GT:AD:DP:Muse_BQ:Muse_SS:Mutect2_AF:Mutect2_F1R2:Mutect2_F2R1:Mutect2_SB:Strelka_AU:Strelka_CU:Strelka_FDP:Strelka_GU:Strelka_SDP:Strelka_SUBDP:Strelka_TU:Vardict_ADJAF:Vardict_AF:Vardict_ALD:Vardict_BIAS:Vardict_HIAF:Vardict_MQ:Vardict_NM:Vardict_ODDRATIO:Vardict_PMEAN:Vardict_PSTD:Vardict_QSTD:Vardict_QUAL:Vardict_RD:Vardict_SBF:Vardict_SN:Vardict_VD	0/0:698,0:698:30,0:.:0.00141:310,0:363,0:47,651,0,0:1,1:705,705:0:0,0:0:0:0,0:0:0:0,0:0,0:0:0:0:0:0:0:0:0:46,658:1:0:0	0/0:694,0:694:30,0:.:0.001413:310,0:362,0:46,648,0,0:1,1:705,705:0:0,0:0:0:0,0:0:0:0,0:0,0:0:0:0:0:0:0:0:0:46,658:1:0:0	0/1:729,53:782:29,34:2:0.069:323,35:366,18:24,705,2,51:3,3:747,751:5:0,0:0:0:51,52:0:0.0636:2,49:1,1:0.0688:70:1.1:1.23:41.2:1:1:34.4:24,724:0.67914:102:51	0/1:629,167:796:29,34:2:0.21:278,79:310,85:24,605,9,158:2,2:642,642:1:2,2:0:0:156,157:0.0012:0.1968:8,150:1,2:0.2069:70:1.3:1.37:40.6:1:1:33.8:24,617:0.49538:51.667:158
