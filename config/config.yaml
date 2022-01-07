@@ -15,7 +15,7 @@ refGenome: '../somaticseq2_resource_bundle/hg19/hg19_canonical_correct_chr_order
 refGenomeDict: '../somaticseq2_resource_bundle/hg19/hg19_canonical_correct_chr_order.dict'
 
 LofreqBamPrepare: TRUE
-PonPrepare: FALSE
+PonPrepare: TRUE
 
 useSomaticCombiner: TRUE
 mergeTag: PASS
@@ -26,6 +26,7 @@ useStrelka: TRUE
 useVardict: TRUE
 VardictSplit: FALSE 
 useTNsnv: FALSE 
+
 useVarscan: FALSE 
 useSniper: FALSE 
 useSentieon: FALSE
