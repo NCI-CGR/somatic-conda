@@ -15,7 +15,6 @@ rule call_Muse:
     output:
         outputDir + '/' + MuseDir + '/merged_{sample}_all.txt'
     params:
-        exe=MuseExe,
         ref=refGenome,
         bed=bedFile,
         raw=outputDir + '/' + MuseDir + '/{sample}.snp'
@@ -37,7 +36,6 @@ rule sump_Muse:
     output:
         outputDir + '/' + MuseDir + '/{sample}_passed.vcf'
     params:
-        exe=MuseExe,
         #dbsnp=dbSNP,
         dbsnp=dbSNP if config['dbSNP'] != 'NA' else 'NA',
         raw=outputDir + '/' + MuseDir + '/{sample}.vcf'

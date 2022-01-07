@@ -3,7 +3,7 @@ import glob
 import sys
 import os
 
-print(os.getcwd()+"\n")
+# print(os.getcwd()+"\n")
 conf = os.environ.get("conf")
 configfile: conf
 
@@ -32,10 +32,7 @@ COSMIC = config['COSMIC']
 gatkExe = config['GATK']
 gatk4 = config['GATK4']
 
-if config['PonPrepare']: 
-    PON = outputDir + '/' + Mutect2Dir + '/PON/pon.vcf.gz'
-else:
-    PON = config['PON']
+
 
 
 #Sentieon
@@ -130,6 +127,9 @@ with open(bedFile) as f:
             
 rule all:
     input:
+        lambda wildcards: expand(outputDir + '/' + LofreqDir + '/tumorBAM/{tumorName}_sorted.bam', tumorName=tumorInBams) if config['LofreqBamPrepare'] else [],
+        lambda wildcards: expand(outputDir + '/' + LofreqDir + '/normalBAM/{normalName}_sorted.bam', normalName=normalInBams) if config['LofreqBamPrepare'] else [],
+        lambda wildcards: outputDir + '/' + Mutect2Dir + '/PON/pon.vcf.gz' if config['PonPrepare'] else [],
         lambda wildcards: expand(outputDir + '/Ensemble/merge/merged.vcf') if config['useSomaticCombiner'] else [],
         lambda wildcards: expand(outputDir + '/' + LofreqDir + '/{sample}_somatic_final.indels.vcf.gz.tbi', sample=SAMPLES) if config['useLofreq'] else [],
         lambda wildcards: expand(outputDir + '/' + LofreqDir + '/{sample}_somatic_final.snvs.vcf.gz.tbi', sample=SAMPLES) if config['useLofreq'] else [], 
@@ -147,400 +147,25 @@ if config['LofreqBamPrepare']:
     include: "rules/LofreqBamPrepare.smk"
 
 if config['PonPrepare']:        
-    rule mutect2_call_normal:
-        input:
-            normalDir + '/{normalName}.bam'
-        output:
-            outputDir + '/' + Mutect2Dir + '/PON/{normalName}.vcf.gz'
-        params:
-            exe = gatk4,
-            ref=refGenome
-        log:
-            stdout=logdir + '/Snakefile/mutect2_call_normal_{normalName}.stdout',
-            stderr=logdir + '/Snakefile/mutect2_call_normal_{normalName}.stderr'
-        conda:
-            "./envs/java18.yaml"
-        shell:
-            #'. /etc/profile.d/modules.sh; module load jdk/1.8.0_111;' 
-            '{params.exe} Mutect2 -R {params.ref} -I {input} --max-mnp-distance 0 -O {output} > {log.stdout} 2>{log.stderr}'
-            
-    rule mutect2_GenomicsDBImport:
-        input:
-            expand(outputDir + '/' + Mutect2Dir + '/PON/{normalName}.vcf.gz', normalName=normalInBams)
-        output:
-            # o1 = outputDir + '/' + Mutect2Dir + '/PON/pon_db/vcfheader.vcf',
-            # o2 = outputDir + '/' + Mutect2Dir + '/PON/pon_db/vidmap.json',
-            # o3 = outputDir + '/' + Mutect2Dir + '/PON/pon_db/callset.json',
-            # o4 = outputDir + '/' + Mutect2Dir + '/PON/pon_db/__tiledb_workspace.tdb',
-            db = outputDir + '/' + Mutect2Dir + '/PON/pon_db'
-        params:
-            exe = gatk4,
-            ref=refGenome,
-            bed = config['bedFile'],
-            vcfList_params = lambda wildcards, input:" -V ".join(input)
-        threads:
-            20
-        log:
-            stdout=logdir + '/Snakefile/mutect2_GenomicsDBImport.stdout',
-            stderr=logdir + '/Snakefile/mutect2_GenomicsDBImport.stderr'   
-        conda:
-            "./envs/environment.yaml"         
-        shell:
-            '. /etc/profile.d/modules.sh; module load jdk/1.8.0_111;' 
-            '{params.exe} GenomicsDBImport -R {params.ref} --merge-input-intervals -L {params.bed} -V {params.vcfList_params} --genomicsdb-workspace-path {output.db} > {log.stdout} 2>{log.stderr}'
-
-    rule mutect2_CreateSomaticPanelOfNormals:
-        input:
-            db = outputDir + '/' + Mutect2Dir + '/PON/pon_db'
-        output:
-            outputDir + '/' + Mutect2Dir + '/PON/pon.vcf.gz'
-        params:
-            exe = gatk4,
-            ref=refGenome,
-            dbSNP = config['dbSNP']
-        log:
-            stdout=logdir + '/Snakefile/mutect2_CreateSomaticPanelOfNormals.stdout',
-            stderr=logdir + '/Snakefile/mutect2_CreateSomaticPanelOfNormals.stderr'
-        conda:
-            "./envs/environment.yaml"             
-        shell:
-            '. /etc/profile.d/modules.sh; module load jdk/1.8.0_111;' 
-            '{params.exe} CreateSomaticPanelOfNormals -R {params.ref} --germline-resource {params.dbSNP} -V gendb://{input} -O {output} > {log.stdout} 2>{log.stderr}'
-
-# rule lofreq_prepare_BAM:
-    # input:
-        # tumorInput=get_tumor,
-        # normalInput=get_normal
-    # output:
-        # tumorBam=outputDir + '/' + LofreqDir + '/' + tumorNameDict[wildcards.sample] + '_sorted.bam', 
-        # normalBam=outputDir + '/' + LofreqDir + '/' + normalNameDict[wildcards.sample] + '_sorted.bam', 
-        # tumorBai=outputDir + '/' + LofreqDir + '/' + tumorNameDict[wildcards.sample] + '_sorted.bam.bai',
-        # normalBai=outputDir + '/' + LofreqDir + '/' + normalNameDict[wildcards.sample] + '_sorted.bam.bai'
-    # params:
-        # exe=lofReqExe,
-        # ref=refGenome,
-        # indelTumorBam=outputDir + '/' + LofreqDir + '/' + tumorNameDict[wildcards.sample] + '_indeled.bam', 
-        # indelNormalBam=outputDir + '/' + LofreqDir + '/' + normalNameDict[wildcards.sample] + '_indeled.bam'
-    # threads:
-        # 8
-    # shell:
-        # '. /etc/profile.d/modules.sh; module load samtools ;'
-        # '{params.exe} indelqual -f {params.ref} --dindel -o {params.indelTumorBam} {input.tumorInput};'
-        # 'samtools sort -o {output.sortedTumorBam} {params.indelTumorBam};'
-        # 'samtools index {output.sortedTumorBam} {output.sortedTumorBai};'
-        # '{params.exe} indelqual -f {params.ref} --dindel -o {params.indelNormalBam} {input.NormalInput};'
-        # 'samtools sort -o {output.sortedNormalBam} {params.indelNormalBam};'
-        # 'samtools index {output.sortedTumorBam} {output.sortedNormalBai};'
-
+    include: "rules/PonPrepare.smk"
 
 if config['useLofreq']:        
-    rule run_lofreq:
-        input:
-            tumorBam=get_tumorLofReq if LofreqBamPrepare else get_tumor,
-            normalBam=get_normalLofReq if LofreqBamPrepare else get_normal
-        output:
-            indel=outputDir + '/' + LofreqDir + '/{sample}_somatic_final.indels.vcf.gz.tbi',
-            indelGz=outputDir + '/' + LofreqDir + '/{sample}_somatic_final.indels.vcf.gz',
-            snp=outputDir + '/' + LofreqDir + '/{sample}_somatic_final.snvs.vcf.gz.tbi',
-            snpGz=outputDir + '/' + LofreqDir + '/{sample}_somatic_final.snvs.vcf.gz'
-        params:
-            exe=lofReqExe,
-            ref=refGenome,
-            bed=bedFile,
-            dbsnp=dbSNP,
-            prefix=outputDir + '/' + LofreqDir + '/{sample}_'
-        threads:
-            8
-        log:
-            stdout=logdir + '/Snakefile/run_lofreq_{sample}.stdout',
-            stderr=logdir + '/Snakefile/run_lofreq_{sample}.stderr'
-        run:
-            if config['dbSNP'] == 'NA':
-                shell('{params.exe} somatic -v -n {input.normalBam} -t {input.tumorBam} -f {params.ref} -l {params.bed} --threads 8 --call-indels -o {params.prefix} > {log.stdout} 2>{log.stderr};')
-                shell('result=$?; if [[ $result -ne 0 ]]; then echo "Error: $(date) run_lofreq failed\!" ; exit;fi >> {log.stdout} 2>>{log.stderr} ')
-            else:
-                shell('{params.exe} somatic -v -n {input.normalBam} -t {input.tumorBam} -f {params.ref} -l {params.bed} --threads 8 --call-indels -o {params.prefix} -d {params.dbsnp} > {log.stdout} 2>{log.stderr};')
-                shell('result=$?; if [[ $result -ne 0 ]]; then echo "Error: $(date) run_lofreq failed\!" ; exit;fi >> {log.stdout} 2>>{log.stderr} ')
-                
-    rule normalize_lofreq:
-        input:
-            Index=outputDir + '/' + LofreqDir + '/{sample}_somatic_final.indels.vcf.gz.tbi',
-            VCF=outputDir + '/' + LofreqDir + '/{sample}_somatic_final.indels.vcf.gz'
-        output:
-            VCF=outputDir + '/' + LofreqDir + '/{sample}_somatic_final.indels_vt_sorted.vcf.gz',
-            Index=outputDir + '/' + LofreqDir + '/{sample}_somatic_final.indels_vt_sorted.vcf.gz.tbi'    
-        log:
-            stdout=logdir + '/Snakefile/normalize_lofreq_{sample}.stdout',
-            stderr=logdir + '/Snakefile/normalize_lofreq_{sample}.stderr'  
-        params:
-            vtOut=temp(outputDir + '/' + LofreqDir + '/{sample}_somatic_final.indels_vt.vcf'),
-            ref=refGenome, 
-            sortOut=temp(outputDir + '/' + LofreqDir + '/{sample}_somatic_final.indels_vt_sorted.vcf')            
-        shell:
-            '. /etc/profile.d/modules.sh; module load vt tabix vcftools;' 
-            'vt normalize -r {params.ref} -o {params.vtOut} {input.VCF} -n >> {log.stdout} 2>>{log.stderr};'              
-            '''awk -F"\t" '$1~/^#/ || $1!~/^GL/ && $1!~/^hs/ && $1!~/^NC/ && $1!~/^MT/ {{print}}' {params.vtOut} | vcf-sort -c > {params.sortOut} 2>>{log.stderr}; ''' 
-            'bgzip {params.sortOut} && tabix -p vcf {output.VCF} 2>>{log.stderr}'
+    include: "rules/Lofreq.smk"
 
 if config['useStrelka']:     
-    rule run_manta:
-        input:
-            tumorBam=get_tumor,
-            normalBam=get_normal
-        output:
-            outputDir + '/' + MantaDir + '/{sample}/results/variants/candidateSmallIndels.vcf.gz'
-        params:
-            exe=MantaExe,
-            ref=refGenome,
-            outdir=outputDir + '/' + MantaDir + '/{sample}'
-        threads:
-            4
-        log:
-            stdout=logdir + '/Snakefile/run_manta_{sample}.stdout',
-            stderr=logdir + '/Snakefile/run_manta_{sample}.stderr'
-        shell:
-            'rm -R {params.outdir};'
-            '{params.exe} --normalBam {input.normalBam} --tumorBam {input.tumorBam} --referenceFasta {params.ref} --runDir {params.outdir} --exome > {log.stdout} 2>{log.stderr};'
-            'result=$?; if [[ $result -ne 0 ]]; then echo "Error: $(date) run_manta failed\!" ; exit;fi >> {log.stdout} 2>>{log.stderr};'
-            '{params.outdir}/runWorkflow.py -m local -j 8 >> {log.stdout} 2>>{log.stderr};'
-            'result=$?; if [[ $result -ne 0 ]]; then echo "Error: $(date) run_manta failed\!" ; exit;fi >> {log.stdout} 2>>{log.stderr}; '
-            
-    rule run_strelka:
-        input:
-            tumorBam=get_tumor,
-            normalBam=get_normal,
-            indelCan=outputDir + '/' + MantaDir + '/{sample}/results/variants/candidateSmallIndels.vcf.gz'
-        output:
-            indel=outputDir + '/' + StrelkaDir + '/{sample}/results/variants/somatic.indels.vcf.gz',
-            indelInd=outputDir + '/' + StrelkaDir + '/{sample}/results/variants/somatic.indels.vcf.gz.tbi',    
-            snp=outputDir + '/' + StrelkaDir + '/{sample}/results/variants/somatic.snvs.vcf.gz'
-        params:
-            exe=StrelkaExe,
-            ref=refGenome,
-            outdir=outputDir + '/' + StrelkaDir + '/{sample}'
-        threads:
-            4
-        log:
-            stdout=logdir + '/Snakefile/run_strelka_{sample}.stdout',
-            stderr=logdir + '/Snakefile/run_strelka_{sample}.stderr'            
-        shell:
-            'rm -R {params.outdir};'
-            '{params.exe} --normalBam {input.normalBam} --tumorBam {input.tumorBam} --referenceFasta {params.ref} --indelCandidates {input.indelCan} --runDir {params.outdir} --exome > {log.stdout} 2>{log.stderr};'
-            'result=$?; if [[ $result -ne 0 ]]; then echo "Error: $(date) run_strelka failed\!" ; exit;fi >> {log.stdout} 2>>{log.stderr};'
-            '{params.outdir}/runWorkflow.py -m local -j 8 >> {log.stdout} 2>>{log.stderr};'
-            'result=$?; if [[ $result -ne 0 ]]; then echo "Error: $(date) run_strelka failed\!" ; exit;fi >> {log.stdout} 2>>{log.stderr};'
-
-    rule normalize_strelka:
-        input:
-            VCF=outputDir + '/' + StrelkaDir + '/{sample}/results/variants/somatic.indels.vcf.gz'
-        output:
-            VCF=outputDir + '/' + StrelkaDir + '/{sample}/results/variants/somatic.indels_vt_sorted.vcf.gz',
-            Index=outputDir + '/' + StrelkaDir + '/{sample}/results/variants/somatic.indels_vt_sorted.vcf.gz.tbi'    
-        log:
-            stdout=logdir + '/Snakefile/normalize_strelka_{sample}.stdout',
-            stderr=logdir + '/Snakefile/normalize_strelka_{sample}.stderr'  
-        params:
-            vtOut=temp(outputDir + '/' + StrelkaDir + '/{sample}/results/variants/somatic.indels_vt.vcf'),
-            ref=refGenome, 
-            sortOut=temp(outputDir + '/' + StrelkaDir + '/{sample}/results/variants/somatic.indels_vt_sorted.vcf')            
-        shell:
-            '. /etc/profile.d/modules.sh; module load vt tabix vcftools;' 
-            'vt normalize -r {params.ref} -o {params.vtOut} {input.VCF} -n >> {log.stdout} 2>>{log.stderr};'              
-            '''awk -F"\t" '$1~/^#/ || $1!~/^GL/ && $1!~/^hs/ && $1!~/^NC/ && $1!~/^MT/ {{print}}' {params.vtOut} | vcf-sort -c > {params.sortOut} 2>>{log.stderr}; ''' 
-            'bgzip {params.sortOut} && tabix -p vcf {output.VCF} 2>>{log.stderr}'
+    include: "rules/Strelka.smk"
 
 if config['useMutect2']:        
-    rule run_mutect2:
-        input:
-            tumorBam=get_tumor,
-            normalBam=get_normal
-        output:
-            outputDir + '/' + Mutect2Dir + '/{sample}_WES_passed.vcf'
-        params:
-            exe=gatk4,
-            ref=refGenome,
-            bed=bedFile,
-            tumorName=lambda wildcards: [tumorNameDict[wildcards.sample]],
-            normalName=lambda wildcards: [normalNameDict[wildcards.sample]],
-            pon='--panel-of-normals ' + PON if (config['PON'] != 'NA' or config['PonPrepare']) else [],
-            raw=outputDir + '/' + Mutect2Dir + '/{sample}_WES.vcf'
-        threads:
-            4
-        log:
-            stdout=logdir + '/Snakefile/run_mutect2_{sample}.stdout',
-            stderr=logdir + '/Snakefile/run_mutect2_{sample}.stderr'          
-        shell:
-            '. /etc/profile.d/modules.sh; module load jdk/1.8.0_111 samtools;' 
-            'NORMAL=$(samtools view -H {input.normalBam} | grep ^@RG | tr \"\\t\" \"\\n\" | grep -m1 "^SM:" | cut -d ":" -f 2); echo "===$NORMAL==="; {params.exe} Mutect2 --disable-sequence-dictionary-validation true --reference {params.ref} -L {params.bed} -I {input.normalBam} -I {input.tumorBam}  -normal $NORMAL -O {params.raw} {params.pon} > {log.stdout} 2>{log.stderr};'
-            #'{params.exe} Mutect2 --disable-sequence-dictionary-validation true --reference {params.ref} -L {params.bed} -I {input.normalBam} -I {input.tumorBam} -tumor Tumor -normal Normal  -O {params.raw} {params.pon} > {log.stdout} 2>{log.stderr};'
-            'result=$(tail -c 1 {params.raw} | wc -l ); if [[ $result -ne 1 ]]; then echo "Error: $(date) run_mutect2 failed\!" ; exit;fi >> {log.stdout} 2>>{log.stderr};'
-            '{params.exe} FilterMutectCalls -R {params.ref} -V {params.raw} -O {output} > {log.stdout} 2>>{log.stderr};'
-            'result=$(tail -c 1 {output} | wc -l ); if [[ $result -ne 1 ]]; then echo "Error: $(date) filter_mutect2 failed\!" ; exit;fi >> {log.stdout} 2>>{log.stderr};'
+    include: "rules/Mutect2.smk"
 
-    rule normalize_mutect2:
-        input:
-            VCF=outputDir + '/' + Mutect2Dir + '/{sample}_WES_passed.vcf'
-        output:
-            VCF=outputDir + '/' + Mutect2Dir + '/{sample}_WES_passed_vt_sorted.vcf.gz',
-            Index=outputDir + '/' + Mutect2Dir + '/{sample}_WES_passed_vt_sorted.vcf.gz.tbi'    
-        log:
-            stdout=logdir + '/Snakefile/normalize_mutect2_{sample}.stdout',
-            stderr=logdir + '/Snakefile/normalize_mutect2_{sample}.stderr'  
-        params:
-            vtOut=temp(outputDir + '/' + Mutect2Dir + '/{sample}_WES_passed_vt.vcf'),
-            ref=refGenome, 
-            sortOut=temp(outputDir + '/' + Mutect2Dir + '/{sample}_WES_passed_vt_sorted.vcf')            
-        shell:
-            '. /etc/profile.d/modules.sh; module load vt tabix vcftools;' 
-            'vt normalize -r {params.ref} -o {params.vtOut} {input.VCF} -n >> {log.stdout} 2>>{log.stderr};'              
-            '''awk -F"\t" '$1~/^#/ || $1!~/^GL/ && $1!~/^hs/ && $1!~/^NC/ && $1!~/^MT/ {{print}}' {params.vtOut} | awk -v OFS='\t' '{{if ($1~/^#CHROM/) {{for (i=1;i<=9;i++) {{printf $i"\t"}} print "NORMAL\tTUMOR";}}else print;}}'| vcf-sort -c > {params.sortOut} 2>>{log.stderr}; ''' 
-            'bgzip {params.sortOut} && tabix -p vcf {output.VCF} 2>>{log.stderr}'
-            
-            
-if config['useSentieon']:        
-    rule run_Sentieon:
-        input:
-            tumorBam=get_tumor,
-            normalBam=get_normal
-        output:
-            outputDir + '/' + SentieonDir + '/{sample}_WES_passed.vcf'
-        params:
-            exe=SentieonExe,
-            ref=refGenome,
-            bed=bedFile,
-            dbsnp='--dbsnp' + dbSNP if config['dbSNP'] != 'NA' else [],
-            cosmic='--cosmic' + COSMIC if config['COSMIC'] != 'NA' else [],
-            pon='--normal_panel ' + PON if (config['PON'] != 'NA' and config['PonPrepare'] != 'TRUE') else [],
-            raw=outputDir + '/' + SentieonDir + '/{sample}_WES.vcf'
-        threads:
-            4            
-        shell:
-            '. /etc/profile.d/modules.sh; module load jdk/1.8.0_111 samtools;'
-            '''BASE_TUMOR=`samtools view -H {input.normalBam} |awk '$1~/^@RG/ {{for (i=1;i<=NF;i++) {{if ($i~/SM/) {{split($i,aa,":"); print aa[2]}}}}}}'|sort|uniq`; 
-            BASE_NORMAL=`samtools view -H {input.normalBam} | awk '$1~/^@RG/ {{for (i=1;i<=NF;i++) {{if ($i~/SM/) {{split($i,aa,":"); print aa[2]}}}}}}'|sort|uniq`; 
-            export SENTIEON_LICENSE="/DCEG/Resources/Tools/goldenhelix/Secondary-Analysis/GoldenHelix-NIH_NCI_DCEG_cluster.lic";
-            time {params.exe} driver -t 8 -r {params.ref} -i {input.normalBam} -i {input.normalBam} --interval {params.bed} --algo TNhaplotyper --tumor_sample $BASE_TUMOR --normal_sample $BASE_NORMAL {params.dbsnp} {params.cosmic} {params.pon} {params.raw};'''
-            ''' awk "($1 ~/^#/) || ($7 ~ /PASS/) {{print}}" {params.raw} > {output} '''
-            
+# Drop useSentieon due to license
+# if config['useSentieon']:        
+
 if config['useMuse']:
     include: "rules/Muse.smk"
  
 if config['useVardict']:
-    if config['VardictSplit']:
-        rule split_bed_file:
-            input: 
-                bed = bedFile
-            output:
-                bed = outputDir + '/' + VardictDir + '/split_regions/{chrom}.bed'
-            log:
-                stdout=logdir + '/Snakefile/split_bed_file_{chrom}.stdout',
-                stderr=logdir + '/Snakefile/split_bed_file_{chrom}.stderr'
-            shell:
-                'grep "^{wildcards.chrom}[[:space:]]" {input.bed} > {output.bed} || true > {output} 2>{log.stderr}'     
-        
-        rule call_Vardict:
-            input:
-                bed=outputDir + '/' + VardictDir + '/split_regions/{chrom}.bed',
-                tumorBam=get_tumor,
-                normalBam=get_normal
-            output: 
-                gz = outputDir + '/' + VardictDir + '/split_regions/{sample}_{chrom}.vcf.gz',
-                index = outputDir + '/' + VardictDir + '/split_regions/{sample}_{chrom}.vcf.gz.tbi'
-            params:
-                exe=VardictExe,
-                minaf=MinAF,
-                ref=refGenome,
-                tumorname=lambda wildcards: tumorNameDict[wildcards.sample],
-                normalname=lambda wildcards: normalNameDict[wildcards.sample]            
-            threads:
-                8 
-            log:
-                stdout=logdir + '/Snakefile/call_Vardict_{sample}_{chrom}.stdout',
-                stderr=logdir + '/Snakefile/call_Vardict_{sample}_{chrom}.stderr'            
-            shell:
-                '. /etc/profile.d/modules.sh; module load samtools R jdk/1.8.0_111 tabix;'
-                '/DCEG/CGF/Bioinformatics/software/VarDictJava/build/distributions/VarDict-1.6.0/bin/VarDict -G {params.ref} -f {params.minaf} -N {params.tumorname} -b \"{input.tumorBam}|{input.normalBam}\" -c 1 -S 2 -E 3 -g 4 -Q 10 {input.bed} | '
-                '{params.exe}/testsomatic.R |  '
-                '{params.exe}/var2vcf_paired.pl -P 0.9 -m 4.25 -f 0.1 -M  -N \"{params.tumorname}|{params.normalname}\" -f {params.minaf} | bgzip > {output.gz} 2>{log.stderr};'
-                'result=$?; if [[ $result -ne 0 ]]; then echo "Error: $(date) call_Vardict failed!" ; exit;fi >> {log.stdout} 2>>{log.stderr};'
-                'tabix -p vcf {output.gz} >> {log.stdout} 2>>{log.stderr};'
-    
-        rule merge_Vardict:
-            input:
-                expand(outputDir + '/' + VardictDir + '/split_regions/{{sample}}_{chrom}.vcf.gz', chrom=chromList)
-            output: 
-                outputDir + '/' + VardictDir + '/{sample}_all.vcf'
-            shell:
-                ". /etc/profile.d/modules.sh; module load zlib vcftools;"
-                "vcf-concat {input} > {output}"
-                        
-    else:
-        rule call_Vardict:
-            input:
-                tumorBam=get_tumor,
-                normalBam=get_normal
-            output: 
-                outputDir + '/' + VardictDir + '/{sample}_all.vcf'
-            params:
-                exe=VardictExe,
-                minaf=MinAF,
-                ref=refGenome,
-                bed=bedFile,
-                tumorname=lambda wildcards: tumorNameDict[wildcards.sample],
-                normalname=lambda wildcards: normalNameDict[wildcards.sample]            
-            threads:
-                8 
-            log:
-                stdout=logdir + '/Snakefile/call_Vardict_{sample}.stdout',
-                stderr=logdir + '/Snakefile/call_Vardict_{sample}.stderr'            
-            shell:
-                '. /etc/profile.d/modules.sh; module load samtools R jdk/1.8.0_111;'
-                '/DCEG/CGF/Bioinformatics/software/VarDictJava/build/distributions/VarDict-1.6.0/bin/VarDict -G {params.ref} -f {params.minaf} -N Tumor -b \"{input.tumorBam}|{input.normalBam}\" -c 1 -S 2 -E 3 -g 4 -Q 10 {params.bed} | '
-                '{params.exe}/testsomatic.R |  '
-                '{params.exe}/var2vcf_paired.pl -P 0.9 -m 4.25 -f 0.1 -M  -N \"Tumor|Normal\" -f {params.minaf} > {output} 2>{log.stderr};'
-                'result=$(tail -c 1 {output} | wc -l ); if [[ $result -ne 1 ]]; then echo "Error: $(date) call_Vardict failed\!" ; exit;fi >> {log.stdout} 2>>{log.stderr};'
-            
-    rule filter_Vardict:
-        input:
-            outputDir + '/' + VardictDir + '/{sample}_all.vcf'
-        output:
-            outputDir + '/' + VardictDir + '/{sample}_final.vcf'
-        params:
-            exe=gatkExe,
-            ref=refGenome,
-            bed=bedFile,
-            intermediate=temp(outputDir + '/' + VardictDir + '/{sample}_all_sorted.vcf'),
-            intermediate2=temp(outputDir + '/' + VardictDir + '/{sample}_all_fil.vcf')
-        log:
-            stdout=logdir + '/Snakefile/filter_Vardict_{sample}.stdout',
-            stderr=logdir + '/Snakefile/filter_Vardict_{sample}.stderr'            
-        shell:
-            '. /etc/profile.d/modules.sh; module load jdk/1.8.0_111 vcftools zlib ;'
-            ''' awk '$1~/^#/ || ($4!=$5 && $4~/^[AGCTagct]+$/ && $5~/^[AGCTagct]+$/ && $7==\"PASS\" && $8~/STATUS=[A-Za-z]+Somatic/) {{print}}' {input} | sed 's/fileformat=VCFv4.3/fileformat=VCFv4.2/'>  {params.intermediate} 2>{log.stderr}; ''' #GATK error out with vcf format version
-            'result=$(tail -c 1 {params.intermediate} | wc -l ); if [[ $result -ne 1 ]]; then echo "Error: $(date) filter_Vardict failed\!" ; exit;fi >> {log.stdout} 2>>{log.stderr};'
-            'java -jar {params.exe} -T VariantFiltration -R {params.ref} -o {params.intermediate2} --variant {params.intermediate} --filterExpression \"((AF*DP < 6) && ((MQ < 55.0 && NM > 1.0) || (MQ < 60.0 && NM > 2.0) || (DP < 10) || (QUAL < 45)))\" --filterName \"VardictFilter\"  >> {log.stdout} 2>>{log.stderr}; '
-            'java -jar {params.exe} -T SelectVariants --disable_auto_index_creation_and_locking_when_reading_rods -R {params.ref} -o {output} --variant {params.intermediate2} -L {params.bed} >> {log.stdout} 2>>{log.stderr};'
-            'result=$(tail -c 1 {output} | wc -l ); if [[ $result -ne 1 ]]; then echo "Error: $(date) filter_Vardict failed\!" ; exit;fi >> {log.stdout} 2>>{log.stderr};'
-
-    rule normalize_Vardict:
-        input:
-            VCF=outputDir + '/' + VardictDir + '/{sample}_final.vcf'
-        output:
-            VCF=outputDir + '/' + VardictDir + '/{sample}_final_vt_sorted.vcf.gz',
-            Index=outputDir + '/' + VardictDir + '/{sample}_final_vt_sorted.vcf.gz.tbi'    
-        log:
-            stdout=logdir + '/Snakefile/normalize_Vardict_{sample}.stdout',
-            stderr=logdir + '/Snakefile/normalize_Vardict_{sample}.stderr'  
-        params:
-            vtOut=temp(outputDir + '/' + VardictDir + '/{sample}_final_vt.vcf'),
-            ref=refGenome, 
-            sortOut=temp(outputDir + '/' + VardictDir + '/{sample}_final_vt_sorted.vcf')            
-        shell:
-            '. /etc/profile.d/modules.sh; module load vt tabix vcftools;' 
-            'vt normalize -r {params.ref} -o {params.vtOut} {input.VCF} -n >> {log.stdout} 2>>{log.stderr};'              
-            '''awk -F"\t" '$1~/^#/ || $1!~/^GL/ && $1!~/^hs/ && $1!~/^NC/ && $1!~/^MT/ {{print}}' {params.vtOut} | vcf-sort -c > {params.sortOut} 2>>{log.stderr}; ''' 
-            'bgzip {params.sortOut} && tabix -p vcf {output.VCF} 2>>{log.stderr}'
-            
+    include: "rules/Vardict.smk"
             
 if config['useVarscan']:
     rule call_Varscan:
@@ -612,74 +237,4 @@ if config['useSniper']:
             'result=$(tail -c 1 {output} | wc -l ); if [[ $result -ne 1 ]]; then echo "Error: $(date) call_Sniper failed\!" ; exit;fi >> {log.stdout} 2>>{log.stderr};'            
             
 if config['useSomaticCombiner']:
-    rule ensemble_5caller:
-        input:
-            L=outputDir + '/' + LofreqDir + '/{sample}_somatic_final.indels.vcf.gz', #vt normalized vcf file will have vcf header of contigs without length causing errors during vcf merge step.
-            l=outputDir + '/' + LofreqDir + '/{sample}_somatic_final.snvs.vcf.gz', 
-            S=outputDir + '/' + StrelkaDir + '/{sample}/results/variants/somatic.indels_vt_sorted.vcf.gz',
-            s=outputDir + '/' + StrelkaDir + '/{sample}/results/variants/somatic.snvs.vcf.gz',   
-            M=outputDir + '/' + Mutect2Dir + '/{sample}_WES_passed_vt_sorted.vcf.gz',   
-            u=outputDir + '/' + MuseDir + '/{sample}_passed.vcf', 
-            D=outputDir + '/' + VardictDir + '/{sample}_final_vt_sorted.vcf.gz'
-        output: 
-            temp(outputDir + '/Ensemble/{sample}_5callers_voting.vcf')
-        threads:
-            4           
-        params:
-            exe=config['SomaticCombiner'],
-            gatkexe=gatkExe,
-            tumorName=lambda wildcards: [tumorNameDict[wildcards.sample]],
-            normalName=lambda wildcards: [normalNameDict[wildcards.sample]],            
-            ref=refGenome 
-        log:
-            stdout=logdir + '/Snakefile/ensemble_5caller_{sample}.stdout',
-            stderr=logdir + '/Snakefile/ensemble_5caller_{sample}.stderr'  
-        conda:
-            "./envs/java18.yaml"          
-        shell:
-            #'. /etc/profile.d/modules.sh; module load jdk/1.8.0_111 ;'        
-            'java -jar {params.exe} -l {input.l} -s {input.s} -S {input.S} -L {input.L} -M {input.M} -u {input.u} -D {input.D} -o {output} > {log.stdout} 2>{log.stderr};'   
-            'sed -i "s/TUMOR\tNORMAL/{params.tumorName}\t{params.normalName}/" {output} >>{log.stdout} 2>>{log.stderr} ; '            
-            #'if [[ $? -ne 0 ]]; then echo "Error: $(date) ensemble output validation is failed!"; exit;fi >> {log.stdout} 2>>{log.stderr};'
-            
-    rule filter_ensemble:
-        input:
-            outputDir + '/Ensemble/{sample}_5callers_voting.vcf'
-        output:
-            outputDir + '/Ensemble/{sample}_5callers_voting_PASS.vcf'
-        log:
-            stdout=logdir + '/Snakefile/filter_ensemble_{sample}.stdout',
-            stderr=logdir + '/Snakefile/filter_ensemble_{sample}.stderr' 
-        params:
-            gatkexe=gatkExe,
-            ref=refGenome,
-            refDict=config['refGenomeDict'],
-            prefix=outputDir + '/Ensemble/{sample}_5callers_voting',
-            sortVcf=outputDir + '/Ensemble/{sample}_5callers_voting.sort.vcf',
-            recodeVcf=temp(outputDir + '/Ensemble/{sample}_5callers_voting.recode.vcf')            
-        shell:
-            '. /etc/profile.d/modules.sh; module load jdk/1.8.0_111 picard zlib vcftools;'
-            'vcftools --vcf {input} --recode  --recode-INFO-all --out {params.prefix};'
-            'picard SortVcf I={params.recodeVcf} O={params.sortVcf} SD={params.refDict};'
-            'java -jar {params.gatkexe} -T ValidateVariants -R {params.ref} -V {params.sortVcf} > {log.stdout} 2>{log.stderr}; '           
-            '''awk -F"\t" '{{if ( $1 ~ "^#" || $7 ~ ";PASS" ){{print}}}}' {params.sortVcf} > {output};'''
-             
-            
-    rule merge_ensemble:
-        input:
-            expand(outputDir + '/Ensemble/{sample}_5callers_voting_PASS.vcf', sample=SAMPLES) if config['mergeTag'] == 'PASS' else expand(outputDir + '/Ensemble/{sample}_5callers_voting.vcf', sample=SAMPLES)
-        output:
-            outputDir + '/Ensemble/merge/merged.vcf'  
-        params:
-            gatkexe=gatkExe,
-            ref=refGenome,
-            vcfList = lambda wildcards, input:" -V ".join(input)            
-        log:
-            stdout=logdir + '/Snakefile/merge_ensemble.stdout',
-            stderr=logdir + '/Snakefile/merge_ensemble.stderr'   
-        conda:
-            "./envs/java18.yaml"         
-        shell:      
-            # '. /etc/profile.d/modules.sh; module load jdk/1.8.0_111 ;'
-            'java -jar {params.gatkexe} -R {params.ref} -T CombineVariants -V {params.vcfList} -o {output} -genotypeMergeOptions UNIQUIFY > {log.stdout} 2>{log.stderr}'
-              
+    include: "rules/SomaticCombiner.smk"

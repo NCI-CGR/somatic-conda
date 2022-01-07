@@ -1,0 +1,11 @@
+channels:
+  - bioconda
+  - conda-forge
+  - r
+  - defaults
+dependencies:
+  - vardict=2019.06.04
+  - samtools=1.9
+  - tabix=1.11
+  - r=3.6.0
+  - perl=5.26.2
