@@ -54,7 +54,7 @@ latency=120
 
 # qsub -cwd -q all.q -N run_Snakefile_$(date +%y%m%d) -o ${LOG_DIR}/run_Snakefile_$(date +%y%m%d).stdout -e ${LOG_DIR}/run_Snakefile_$(date +%y%m%d).stderr -b y "$CMD"
 
-cmd="conf=$configFile snakemake --cores $numJobs --verbose --use-conda  -p -s ${execDir}/workflow/Snakefile --rerun-incomplete  --jobs $numJobs --latency-wait ${latency} &> ${LOG_DIR}/run_Snakefile_$(date +%y%m%d).out"
+cmd="conf=$configFile snakemake --cores $numJobs --verbose --use-conda  -p -s ${execDir}/workflow/Snakefile --rerun-incomplete  --jobs $numJobs --conda-frontend mamba --latency-wait ${latency} &> ${LOG_DIR}/run_Snakefile_$(date +%y%m%d).out"
 
 
 # module load python3 sge
