@@ -51,7 +51,7 @@ rule normalize_lofreq:
         ref=refGenome, 
         sortOut=temp(outputDir + '/' + LofreqDir + '/{sample}_somatic_final.indels_vt_sorted.vcf')  
     conda:
-        "../envs/vcftools"          
+        "../envs/vcftools.yaml"          
     shell:
         # '. /etc/profile.d/modules.sh; module load vt tabix vcftools;' 
         'vt normalize -r {params.ref} -o {params.vtOut} {input.VCF} -n >> {log.stdout} 2>>{log.stderr};'              
