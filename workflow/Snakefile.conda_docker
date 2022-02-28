@@ -1,0 +1,242 @@
+#!/usr/bin/python
+import glob
+import sys
+import os
+
+containerized:"docker://cgrlab/somatic_conda:1.0.0" 
+
+# print(os.getcwd()+"\n")
+conf = os.environ.get("conf")
+configfile: conf
+
+manifestFile = config['manifest']
+refGenome = config['refGenome']
+bedFile = config['bedFile']
+
+    
+#Lofreq
+LofreqBamPrepare = config['LofreqBamPrepare']
+lofReqExe = config['Lofreq']
+outputDir = config['outputDir']
+LofreqDir = config['LofreqDir']
+
+#Strelka
+StrelkaExe = config['Strelka']
+MantaExe = config['Manta']
+StrelkaDir = config['StrelkaDir']
+MantaDir = config['MantaDir']
+
+#Mutect2
+Mutect2Exe = config['Mutect2']
+Mutect2Dir = config['Mutect2Dir']
+dbSNP = config['dbSNP']
+COSMIC = config['COSMIC']
+gatkExe = config['GATK']
+gatk4 = config['GATK4']
+
+
+
+
+#Sentieon
+SentieonExe = config['Sentieon']
+SentieonDir = config['SentieonDir']
+
+#Muse
+MuseExe = config['Muse']
+MuseDir = config['MuseDir']
+
+#Vardict
+VardictExe = config['VarDict']
+VardictDir = config['VardictDir']
+MinAF = config['VardictMAF']
+
+#Varscan
+VarscanDir = config['VarscanDir']
+VarscanExe = config['VarScan']
+
+#Sniper
+SniperDir = config['SniperDir']
+
+logdir = config['logDir']
+
+inputDir= config['inputDir'].rstrip('/') + '/'  # ensure one trailing slash
+
+SAMPLES = []
+tumorDict = {}
+normalDict = {}
+vcfDict = {}
+tumorNameDict = {}
+normalNameDict = {}
+
+with open(manifestFile) as f:
+    for line in f:
+        (tumor, normal, vcf) = line.split()
+        sample = os.path.basename(vcf)[:-4]
+        SAMPLES.append(os.path.basename(vcf)[:-4])
+        tumorName = os.path.basename(tumor)[:-4]
+        normalName = os.path.basename(normal)[:-4]
+        tumorDict[sample] = (inputDir + tumor)
+        normalDict[sample] = (inputDir + normal)
+        vcfDict[sample] = (vcf)
+        tumorNameDict[sample] = (tumorName)
+        normalNameDict[sample] = (normalName)
+
+
+tumorInBams = [] #list to store uniq tumor/normal bam files for lofReq prepare bam 
+normalInBams = []
+
+with open(manifestFile) as f:
+    for line in f:
+#        (tumor, normal, vcf) = line.split()
+#        sample = os.path.basename(vcf)[:-4]
+        tumor = inputDir + line.split()[0]
+        tumorName = os.path.basename(tumor)[:-4]
+        if (tumorName not in tumorInBams):
+            tumorInBams.append(str(tumorName))  
+        normal = inputDir + line.split()[1]           
+        normalName = os.path.basename(normal)[:-4]        
+        if (normalName not in normalInBams):
+            normalInBams.append(str(normalName))
+
+tumorDir = os.path.dirname(tumor)
+normalDir = os.path.dirname(normal)
+
+def get_tumor(wildcards):
+    (file) = tumorDict[wildcards.sample]
+    return file
+
+def get_normal(wildcards):
+    (file) = normalDict[wildcards.sample]
+    return file
+    
+def get_tumorLofReq(wildcards):
+    (tumorName) = tumorNameDict[wildcards.sample]
+    return (str(outputDir + '/' + LofreqDir +  '/tumorBAM/' + tumorName + '_sorted.bam'))
+#    return (glob.glob(outputDir + '/' + LofreqDir +  '/' + tumorName + '_sorted.bam')) #Why have to use glob instead of using the string
+    
+def get_normalLofReq(wildcards):
+    (normalName) = normalNameDict[wildcards.sample]
+    return (str(outputDir + '/' + LofreqDir +  '/normalBAM/' + normalName + '_sorted.bam'))
+#    return (glob.glob(outputDir + '/' + LofreqDir +  '/' + normalName + '_sorted.bam'))
+ 
+chromList = []
+with open(bedFile) as f:
+    next(f)
+    for line in f:
+        chr = line.split("\t")[0]
+        if chr not in chromList:
+            chromList.append(chr) 
+            
+rule all:
+    input:
+        lambda wildcards: expand(outputDir + '/' + LofreqDir + '/tumorBAM/{tumorName}_sorted.bam', tumorName=tumorInBams) if config['LofreqBamPrepare'] else [],
+        lambda wildcards: expand(outputDir + '/' + LofreqDir + '/normalBAM/{normalName}_sorted.bam', normalName=normalInBams) if config['LofreqBamPrepare'] else [],
+        lambda wildcards: outputDir + '/' + Mutect2Dir + '/PON/pon.vcf.gz' if config['PonPrepare'] else [],
+        lambda wildcards: expand(outputDir + '/Ensemble/merge/merged.vcf') if config['useSomaticCombiner'] else [],
+        lambda wildcards: expand(outputDir + '/' + LofreqDir + '/{sample}_somatic_final.indels.vcf.gz.tbi', sample=SAMPLES) if config['useLofreq'] else [],
+        lambda wildcards: expand(outputDir + '/' + LofreqDir + '/{sample}_somatic_final.snvs.vcf.gz.tbi', sample=SAMPLES) if config['useLofreq'] else [], 
+        lambda wildcards: expand(outputDir + '/' + StrelkaDir + '/{sample}/results/variants/somatic.indels.vcf.gz', sample=SAMPLES) if config['useStrelka'] else [],
+        lambda wildcards: expand(outputDir + '/' + StrelkaDir + '/{sample}/results/variants/somatic.snvs.vcf.gz', sample=SAMPLES) if config['useStrelka'] else [],   
+        lambda wildcards: expand(outputDir + '/' + Mutect2Dir + '/{sample}_WES_passed.vcf', sample=SAMPLES) if config['useMutect2'] else [],    
+        lambda wildcards: expand(outputDir + '/' + MuseDir + '/{sample}_passed.vcf', sample=SAMPLES) if config['useMuse'] else [],     
+        lambda wildcards: expand(outputDir + '/' + VardictDir + '/{sample}_final.vcf', sample=SAMPLES) if config['useVardict'] else [],        
+        lambda wildcards: expand(outputDir + '/' + VarscanDir + '/{sample}_snps.Somatic.hc.vcf', sample=SAMPLES) if config['useVarscan'] else [],
+        lambda wildcards: expand(outputDir + '/' + VarscanDir + '/{sample}_indels.Somatic.hc.vcf', sample=SAMPLES) if config['useVarscan'] else [],   
+        lambda wildcards: expand(outputDir + '/' + SniperDir + '/sniper_{sample}.vcf', sample=SAMPLES) if config['useSniper'] else []        
+#https://stackoverflow.com/questions/57090794/put-optional-input-files-for-rule-all-in-snakemake
+
+if config['LofreqBamPrepare']:
+    include: "rules/LofreqBamPrepare.smk"
+
+if config['PonPrepare']:        
+    include: "rules/PonPrepare.smk"
+
+if config['useLofreq']:        
+    include: "rules/Lofreq.smk"
+
+if config['useStrelka']:     
+    include: "rules/Strelka.smk"
+
+if config['useMutect2']:        
+    include: "rules/Mutect2.smk"
+
+# Drop useSentieon due to license
+# if config['useSentieon']:        
+
+if config['useMuse']:
+    include: "rules/Muse.smk"
+ 
+if config['useVardict']:
+    include: "rules/Vardict.smk"
+            
+if config['useVarscan']:
+    rule call_Varscan:
+        input:
+            tumorBam=get_tumor,
+            normalBam=get_normal
+        output: 
+            indel=outputDir + '/' + VarscanDir + '/{sample}_indels.vcf',
+            snp=outputDir + '/' + VarscanDir + '/{sample}_snps.vcf'
+        params:
+            exe=VarscanExe,
+            ref=refGenome,
+            bed=bedFile,
+            tumor_pileup=lambda wildcards: [outputDir + '/' + VarscanDir +  tumorNameDict[sample] + '.mpileup'],
+            normal_pileup=lambda wildcards: [outputDir + '/' + VarscanDir +  normalNameDict[sample] + '.mpileup'],
+            indel=outputDir + '/' + VarscanDir + '/{sample}_indels',
+            snp=outputDir + '/' + VarscanDir + '/{sample}_snps'            
+        threads:
+            4 
+        log:
+            stdout=logdir + '/Snakefile/call_Varscan_{sample}.stdout',
+            stderr=logdir + '/Snakefile/call_Varscan_{sample}.stderr'            
+        shell:
+            '. /etc/profile.d/modules.sh; module load samtools R jdk/1.8.0_111;'
+            'samtools mpileup -q 1 -l {params.bed} -f {params.ref} {input.tumorBam} > {params.tumor_pileup} 2>{log.stderr}; '
+            'result=$(tail -c 1 {params.tumor_pileup} | wc -l ); if [[ $result -ne 1 ]]; then echo "Error: $(date) Tumor mpileup failed\!" ; exit;fi >> {log.stdout} 2>>{log.stderr};'
+            'samtools mpileup -q 1 -l {params.bed} -f {params.ref} {input.normalBam} > {params.normal_pileup} 2>>{log.stderr}; '
+            'result=$(tail -c 1 {params.normal_pileup} | wc -l ); if [[ $result -ne 1 ]]; then echo "Error: $(date) Normal mpileup failed\!" ; exit;fi >> {log.stdout} 2>>{log.stderr};'
+            'java -Xmx64g -jar {params.exe} somatic {params.normal_pileup} {params.tumor_pileup} --output-snp {params.snp} --output-indel {params.indel} --output-vcf 1 >> {output} 2>>{log.stderr};'
+            'result=$(tail -c 1 {output.snp} | wc -l ); if [[ $result -ne 1 ]]; then echo "Error: $(date) call_Varscan failed\!" ; exit;fi >> {log.stdout} 2>>{log.stderr};'
+            
+    rule processSomatic_Varscan:
+        input:
+            indel=outputDir + '/' + VarscanDir + '/{sample}_indels.vcf',
+            snp=outputDir + '/' + VarscanDir + '/{sample}_snps.vcf'  
+        output:
+            indel=outputDir + '/' + VarscanDir + '/{sample}_indels.Somatic.hc.vcf',
+            snp=outputDir + '/' + VarscanDir + '/{sample}_snps.Somatic.hc.vcf'   
+        params:
+            exe=VarscanExe            
+        log:
+            stdout=logdir + '/Snakefile/call_Varscan_{sample}.stdout',
+            stderr=logdir + '/Snakefile/call_Varscan_{sample}.stderr' 
+        conda:
+            "./envs/java18.yaml" 
+        shell:
+            #'. /etc/profile.d/modules.sh; module load jdk/1.8.0_111;' 
+            'java -jar {params.exe} processSomatic {input.indel} >> {log.stdout} 2>>{log.stderr};'
+            'result=$(tail -c 1 {output.indel} | wc -l ); if [[ $result -ne 1 ]]; then echo "Error: $(date) Indel processSomatic failed\!" ; exit;fi >> {log.stdout} 2>>{log.stderr};'
+            'java -jar {params.exe} processSomatic {input.snp} >> {log.stdout} 2>>{log.stder}'
+ 
+if config['useSniper']:
+    rule call_Sniper:
+        input:
+            tumorBam=get_tumor,
+            normalBam=get_normal
+        output: 
+            outputDir + '/' + SniperDir + '/sniper_{sample}.vcf'
+        params:
+            ref=refGenome,   
+        threads:
+            4 
+        log:
+            stdout=logdir + '/Snakefile/call_Sniper_{sample}.stdout',
+            stderr=logdir + '/Snakefile/call_Sniper_{sample}.stderr'
+        shell:
+            '. /etc/profile.d/modules.sh; module load somaticsniper;'
+            'somaticsniper -J -F vcf -G -L -Q 40 -L -q 1 -f {params.ref} {input.tumorBam} {input.normalBam} {output} >> {log.stdout} 2>>{log.stderr};'
+            'result=$(tail -c 1 {output} | wc -l ); if [[ $result -ne 1 ]]; then echo "Error: $(date) call_Sniper failed\!" ; exit;fi >> {log.stdout} 2>>{log.stderr};'            
+            
+if config['useSomaticCombiner']:
+    include: "rules/SomaticCombiner.smk"
