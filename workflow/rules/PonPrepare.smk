@@ -11,6 +11,8 @@ rule mutect2_call_normal:
     log:
         stdout=logdir + '/Snakefile/mutect2_call_normal_{normalName}.stdout',
         stderr=logdir + '/Snakefile/mutect2_call_normal_{normalName}.stderr'
+    threads:
+	4
     conda:
         "../envs/gatk4.yaml"
     shell:
