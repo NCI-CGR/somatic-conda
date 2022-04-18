@@ -3,7 +3,7 @@ import glob
 import sys
 import os
 
-containerized:"docker://cgrlab/somatic_conda:1.0.0" 
+containerized:"docker://cgrlab/somatic_conda:1.0.6" 
 
 # print(os.getcwd()+"\n")
 conf = os.environ.get("conf")
